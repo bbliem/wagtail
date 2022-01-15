@@ -15,6 +15,8 @@ from wagtail.admin.auth import PermissionPolicyChecker
 from wagtail.admin.forms.search import SearchForm
 from wagtail.admin.models import popular_tags_for_model
 from wagtail.admin.views.pages.utils import get_valid_next_url_from_request
+from wagtail.core import hooks
+from wagtail.core.models import Collection
 from wagtail.documents import get_document_model
 from wagtail.documents.forms import get_document_form
 from wagtail.documents.permissions import permission_policy
@@ -97,6 +99,8 @@ class IndexView(BaseListingView):
         collections = permission_policy.collections_user_has_any_permission_for(
             self.request.user, ["add", "change"]
         )
+        for hook in hooks.get_hooks('filter_document_index_collections'):
+            collections = hook(collections, self.request)
         if len(collections) < 2:
             collections = None
 

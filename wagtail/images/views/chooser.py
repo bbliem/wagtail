@@ -109,6 +109,8 @@ class ChooseView(BaseChooseView):
         collections = permission_policy.collections_user_has_permission_for(
             self.request.user, "choose"
         )
+        for hook in hooks.get_hooks('filter_image_chooser_collections'):
+            collections = hook(collections, self.request)
         if len(collections) < 2:
             collections = None
 

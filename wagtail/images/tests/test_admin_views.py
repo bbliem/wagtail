@@ -228,6 +228,21 @@ class TestImageListingResultsView(TestCase, WagtailTestUtils):
             "/admin/images/%d/?next=/admin/images/%%3Fq%%3Dmonster" % monster.id,
         )
 
+    def test_filter_collections(self):
+        root_collection = Collection.get_first_root_node()
+        # IndexView.get_context_data() will not report any collections if there are less than two to be shown
+        root_collection.add_child(name="Evil plans")
+        root_collection.add_child(name="Good plans")
+
+        def filter_collections(collections, request):
+            return collections.filter(name__endswith='plans')
+
+        with self.register_hook('filter_image_index_collections', filter_collections):
+            response = self.get()
+        self.assertEqual(
+            [collection.name for collection in response.context['collections']],
+            ['Evil plans', 'Good plans'])
+
 
 class TestImageAddView(TestCase, WagtailTestUtils):
     def setUp(self):
@@ -1163,6 +1178,38 @@ class TestImageChooserView(TestCase, WagtailTestUtils):
             response = self.get({"q": "Test"})
         self.assertEqual(len(response.context["images"]), 1)
         self.assertEqual(response.context["images"][0], image)
+
+    def test_filter_collections_browse(self):
+        root_collection = Collection.get_first_root_node()
+        # ChooseView.get_context_data() will not report any collections if there are less than two to be shown
+        collection1 = root_collection.add_child(name='Test collection shown 1')
+        collection2 = root_collection.add_child(name='Test collection shown 2')
+        root_collection.add_child(name='Test collection not shown')
+
+        def filter_collections(collections, request):
+            return collections.filter(name__startswith='Test collection shown')
+
+        with self.register_hook('filter_image_chooser_collections', filter_collections):
+            response = self.get()
+        self.assertEqual(len(response.context['collections']), 2)
+        self.assertEqual(response.context['collections'][0], collection1)
+        self.assertEqual(response.context['collections'][1], collection2)
+
+    def test_filter_collections_search(self):
+        root_collection = Collection.get_first_root_node()
+        # ChooseView.get_context_data() will not report any collections if there are less than two to be shown
+        collection1 = root_collection.add_child(name='Test collection shown 1')
+        collection2 = root_collection.add_child(name='Test collection shown 2')
+        root_collection.add_child(name='Test collection not shown')
+
+        def filter_collections(collections, request):
+            return collections.filter(name__startswith='Test collection shown')
+
+        with self.register_hook('filter_image_chooser_collections', filter_collections):
+            response = self.get({'q': 'Test'})
+        self.assertEqual(len(response.context['collections']), 2)
+        self.assertEqual(response.context['collections'][0], collection1)
+        self.assertEqual(response.context['collections'][1], collection2)
 
 
 class TestImageChooserChosenView(TestCase, WagtailTestUtils):

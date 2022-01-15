@@ -1062,6 +1062,82 @@ Choosers
         return images
 
 
+.. _filter_document_chooser_collections:
+
+``filter_document_chooser_collections``
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+  Called when rendering the document chooser view, to allow the collection listing QuerySet to be customised. The callable passed into the hook will receive the current collection QuerySet and the request object, and must return a Collection QuerySet (either the original one, or a new one).
+
+  .. code-block:: python
+
+    from wagtail.core import hooks
+
+    @hooks.register('filter_document_chooser_collections')
+    def show_subcollections_only(collections, request):
+        # Show collections that are not roots
+        collections = collections.filter(depth__gt=1)
+
+        return collections
+
+
+.. _filter_image_chooser_collections:
+
+``filter_image_chooser_collections``
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+  Called when rendering the image chooser view, to allow the collection listing QuerySet to be customised. The callable passed into the hook will receive the current collection QuerySet and the request object, and must return a Collection QuerySet (either the original one, or a new one).
+
+  .. code-block:: python
+
+    from wagtail.core import hooks
+
+    @hooks.register('filter_image_chooser_collections')
+    def show_subcollections_only(collections, request):
+        # Show collections that are not roots
+        collections = collections.filter(depth__gt=1)
+
+        return collections
+
+
+.. _filter_document_index_collections:
+
+``filter_document_index_collections``
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+  Called when rendering the document index view, to allow the collection listing QuerySet to be customised. The callable passed into the hook will receive the current collection QuerySet and the request object, and must return a Collection QuerySet (either the original one, or a new one).
+
+  .. code-block:: python
+
+    from wagtail.core import hooks
+
+    @hooks.register('filter_document_index_collections')
+    def show_subcollections_only(collections, request):
+        # Show collections that are not roots
+        collections = collections.filter(depth__gt=1)
+
+        return collections
+
+
+.. _filter_image_index_collections:
+
+``filter_image_index_collections``
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+  Called when rendering the image index view, to allow the collection listing QuerySet to be customised. The callable passed into the hook will receive the current collection QuerySet and the request object, and must return a Collection QuerySet (either the original one, or a new one).
+
+  .. code-block:: python
+
+    from wagtail.core import hooks
+
+    @hooks.register('filter_image_index_collections')
+    def show_subcollections_only(collections, request):
+        # Show collections that are not roots
+        collections = collections.filter(depth__gt=1)
+
+        return collections
+
+
 Page explorer
 -------------
 

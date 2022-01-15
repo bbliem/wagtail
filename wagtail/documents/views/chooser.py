@@ -98,6 +98,8 @@ class BaseChooseView(View):
         self.collections = permission_policy.collections_user_has_permission_for(
             request.user, "choose"
         )
+        for hook in hooks.get_hooks('filter_document_chooser_collections'):
+            self.collections = hook(self.collections, request)
         if len(self.collections) < 2:
             self.collections = None
 

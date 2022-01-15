@@ -18,6 +18,8 @@ from wagtail.admin.auth import PermissionPolicyChecker
 from wagtail.admin.forms.search import SearchForm
 from wagtail.admin.models import popular_tags_for_model
 from wagtail.admin.views.pages.utils import get_valid_next_url_from_request
+from wagtail.core import hooks
+from wagtail.core.models import Collection, Site
 from wagtail.images import get_image_model
 from wagtail.images.exceptions import InvalidFilterSpecError
 from wagtail.images.forms import URLGeneratorForm, get_image_form
@@ -108,6 +110,8 @@ class IndexView(BaseListingView):
         collections = permission_policy.collections_user_has_any_permission_for(
             self.request.user, ["add", "change"]
         )
+        for hook in hooks.get_hooks('filter_image_index_collections'):
+            collections = hook(collections, self.request)
         if len(collections) < 2:
             collections = None
 
